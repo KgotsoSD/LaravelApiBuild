@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 
 class ProductsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware("auth:santum",["except"=>["index"],"show"]);
+
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +19,13 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        //
+        $Productsx=Products::all();
+
+        return response()->json([
+            "success"=> true,
+            "productsx"=>$productsx,
+
+        ]);
     }
 
     /**
@@ -24,7 +35,7 @@ class ProductsController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -35,7 +46,24 @@ class ProductsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            "title"=>"required",
+            "description"=> "required",
+            "price"=>"required",
+        ]);
+
+        $products=Products::create([
+            "title"=>"required",
+            "description"=>"required",
+            "price"=>$request->price,
+
+        ]);
+
+        return response()->json([
+            "success"=>true,
+            "product"=>$product,
+
+        ]);
     }
 
     /**
@@ -44,9 +72,16 @@ class ProductsController extends Controller
      * @param  \App\Models\Products  $products
      * @return \Illuminate\Http\Response
      */
-    public function show(Products $products)
+    public function show($id)
     {
-        //
+        $products=Productss::find($id);
+        return response()->json([
+
+            "success"=>true,
+            "products"=>$products,
+
+
+        ]);
     }
 
     /**
@@ -69,7 +104,14 @@ class ProductsController extends Controller
      */
     public function update(Request $request, Products $products)
     {
-        //
+        $products=Products::find($id);
+        $products->update($request->all());
+
+        return response()->json([
+            "success"=>true,
+            "product"=>$product,
+        ]);
+
     }
 
     /**
@@ -80,6 +122,11 @@ class ProductsController extends Controller
      */
     public function destroy(Products $products)
     {
-        //
+        Products::find($id)->delete();
+
+        return response()->json([
+            "success"=>true,
+            "message"=>"the product has been deleted!",
+        ]);
     }
 }
