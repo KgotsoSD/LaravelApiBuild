@@ -33,7 +33,34 @@ class AuthController extends Controller
     }
     public function logout(Request $request)
     {
+        $request->validate([
+           "email"=>"required|email",
+           "password"=>"required",
+        ]);
+
+      if (!Auth::attempt($request->only("email","password")))
+       {
+          return response()->json(["success"=>false,"message"=>"The provided credentials are incorrect"]);
+       }
+      return response()->json(["success"=>true,"message"=>"Logged Out!"]);
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            "email"=>"required|email",
+            "password"=>"required",
+         ]);
+
+       if (!Auth::attempt($request->only("email","password"))){  
+         return response()->json(["success"=>false,"message"=>"The provided credentials are incorrect"]);
+       }
+
+       $user=User::where("email",$request["email"])->firstOrFail();
+       $token=$user->createToken("token-name")->plainTextToken;
        $request->user()->currentAccessToken()->delete();
-       return response()->json(["success"=>true,"message"=>"Logged Out!"]);
+       return response()->json(["success"=>true,
+       "user"=>$user,
+        "token"=>token]);
     }
 }
